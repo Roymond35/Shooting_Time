@@ -37,20 +37,12 @@ public class MainActivity extends AppCompatActivity {
     TextView shotCalled;
     Random shotCallRand = new Random();
     Button startButton;
-    Shot[] shots = new Shot[6];
-    int previous_shot;
     int[] shotFiles;
+    String[] shotNames;
+    MediaPlayer sound;
 
-    public class Shot {
-        public MediaPlayer audioFile;
-        public String text;
-
-        public Shot(String name, MediaPlayer audio){
-            text = name;
-            audioFile = audio;
-        }
-    }
-
+    //Remove later
+    int howMany = 0;
 
     public void checkShots(){
         if(numberOfShots > NUMBER_OF_SHOTS_MAX){
@@ -98,17 +90,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void shotCall(){
-        int shotChosen = shotCallRand.nextInt(shots.length);
-        if(shotChosen == previous_shot){
-            Log.i("This is called","Did it play?");
-            shots[shotChosen].audioFile = MediaPlayer.create(this,shotFiles[shotChosen]);
-        }
-        shots[shotChosen].audioFile.start();
-        previous_shot = shotChosen;
-        shotCalled.setText(shots[shotChosen].text);
+        int shotChosen = shotCallRand.nextInt(shotNames.length);
+        if(sound!=null){ sound.reset(); }
+        sound = MediaPlayer.create(this,shotFiles[shotChosen]);
+        sound.start();
+        shotCalled.setText(shotNames[shotChosen]);
         numberOfShots-=1;
         shotsRemaining.setText("SHOTS LEFT\n" + String.valueOf(numberOfShots));
-
     }
 
     public void endGame() {
@@ -118,18 +106,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void playGame(){
-        long countDownData = (long)(timeBetweenShots*1000 * numberOfShots); //Remember! Convert from Seconds to Milliseconds!
+        long countDownData = (long)(timeBetweenShots*1000 * (numberOfShots)); //Remember! Convert from Seconds to Milliseconds!
         Log.i("Time",String.valueOf(countDownData));
         new CountDownTimer(countDownData+100,(long)(timeBetweenShots*1000)){
 
             @Override
             public void onTick(long millisUntilFinished) {
                 shotCall();
+                howMany++;
+
             }
 
             @Override
             public void onFinish() {
                 endGame();
+                Log.i("How Many", String.valueOf(howMany));
             }
         }.start();
     }
@@ -167,15 +158,9 @@ public class MainActivity extends AppCompatActivity {
         shotsRemaining = (TextView)findViewById(R.id.shotsRemaining);
         shotCalled = (TextView)findViewById(R.id.shotCalled);
         startButton = (Button)findViewById(R.id.startButton);
-        previous_shot = -1;
 
-        shots[0] = new Shot("Bottom Left", MediaPlayer.create(this, R.raw.bottomleft));
-        shots[1] = new Shot("Bottom Right", MediaPlayer.create(this, R.raw.bottomright));
-        shots[2] = new Shot("Five Hole", MediaPlayer.create(this, R.raw.fivehole));
-        shots[3] = new Shot("Top Left", MediaPlayer.create(this, R.raw.topleft));
-        shots[4] = new Shot("Top Right", MediaPlayer.create(this, R.raw.topright));
-        shots[5] = new Shot("Crossbar", MediaPlayer.create(this, R.raw.crossbar));
 
+        shotNames = new String[]{"Bottom Left","Bottom Right","Five Hole", "Top Left", "Top Right", "Crossbar"};
         shotFiles = new int[]{R.raw.bottomleft, R.raw.bottomright, R.raw.fivehole, R.raw.topleft, R.raw.topright, R.raw.crossbar};
 
         numShots.setOnEditorActionListener(new TextView.OnEditorActionListener() {
