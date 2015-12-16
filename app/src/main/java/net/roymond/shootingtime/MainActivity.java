@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         gamePlaying.setVisibility(View.INVISIBLE);
         startMenu.setVisibility(View.INVISIBLE);
         gameOver.setVisibility(View.VISIBLE);
+        MediaPlayer gameOver = MediaPlayer.create(this, R.raw.gameover);
+        gameOver.start();
     }
 
     public void playGame(){
